@@ -3,9 +3,10 @@
  *  2018
  *  Last update: Mar-05-2018
  */
- 
+
 #pragma once
 #include <Arduino.h>
+#include "stub.h"
 
 class Settings;
 
@@ -53,7 +54,7 @@ class MidiHandler {
   
     static const byte TX_BRIGHTNESS = 74;
 
-    // Data received by teensy
+    // Data received by Teensy
     static const byte RX_THRESHOLD = 48;
     static const byte RX_PERCENTAGE_TOP = 49;
     static const byte RX_PERCENTAGE_BOTTOM = 50;

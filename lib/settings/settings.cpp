@@ -315,6 +315,4 @@ void Settings::sendInitValuesToMidi() {
   usbMIDI.sendControlChange(MidiHandler::TX_BOTTOM_LINES,bottomLines,MidiHandler::MAIN_MIDI_CHANNEL);
   usbMIDI.sendControlChange(MidiHandler::TX_TRACKER_TIME,timeTracker,MidiHandler::MAIN_MIDI_CHANNEL);
   usbMIDI.sendControlChange(MidiHandler::TX_TRACKER_DIST,distTracker,MidiHandler::MAIN_MIDI_CHANNEL);
-  usbMIDI.send_now();   
-
 }

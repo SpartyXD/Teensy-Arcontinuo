@@ -154,8 +154,6 @@ if (settings->distTracker != inputData[8]) {
     //dispInt("numBlobs ", settings->numBlobs);
     usbMIDI.sendControlChange(MidiHandler::TX_NUM_BLOBS,settings->numBlobs,MidiHandler::MAIN_MIDI_CHANNEL);
   }
-  usbMIDI.send_now();   
-
 }
 
 
