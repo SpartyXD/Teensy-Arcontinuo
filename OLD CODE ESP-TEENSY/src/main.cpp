@@ -11,7 +11,13 @@
 #include "dataHandler.h"
 #include "settings.h"
 
+// Cambiamos esta librería 
 #include <MIDI.h>
+
+#include <Adafruit_TinyUSB.h>
+Adafruit_USBD_MIDI usb_midi;
+MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
+
 
 // Arcontinuo configuration
 int serialNumber = 0;
