@@ -14,6 +14,10 @@
 
 
 
+//=====================================
+//LOCKS
+
+
 
 //=====================================
 //MACROS / PARAMETERS / AUX FUNCTIONS
@@ -23,6 +27,9 @@
 unsigned long get_time(){
     return (millis()%MAX_ARDUINO_TIME);
 }
+
+#define DATA_CORE 0
+#define MIDI_CORE 1
 
 
 //=====================================
