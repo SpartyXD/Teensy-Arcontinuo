@@ -28,8 +28,8 @@ unsigned long get_time(){
     return (millis()%MAX_ARDUINO_TIME);
 }
 
-#define DATA_CORE 0
-#define MIDI_CORE 1
+#define DATA_CORE 1
+#define MIDI_CORE 0
 
 
 //=====================================
