@@ -8,9 +8,12 @@
 #include <EEPROM.h>
 #include "Adafruit_TinyUSB.h"
 #include "MIDI.h"
-#include "utils.h"
+#include "utils.h" // no se que onda pero me lo tira a error (pero compila igual)
+#include "pitchHandler.h"
+
 
 Utils utils;
+PitchHandler pitchHandler;
 
 Adafruit_USBD_MIDI usb_midi;
 MIDI_CREATE_INSTANCE(Adafruit_USBD_MIDI, usb_midi, MIDI);
