@@ -30,7 +30,7 @@ void midiAfterTouch(uint8_t pressure, uint8_t channel);
 //---------------------------------------------
 
 void initMIDI(){
-    TinyUSBDevice.setManufacturerDescriptor("Arcontinuo Industries");
+    TinyUSBDevice.setManufacturerDescriptor("Acme Industries");
     TinyUSBDevice.setProductDescriptor("ESP32 S3-MIDI");
     
     TinyUSBDevice.begin();

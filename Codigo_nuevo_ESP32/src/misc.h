@@ -11,7 +11,15 @@
 
 //=====================================
 //PINS
+#define RX_PIN 16   // Pin donde llega el TX1 del Mega
+#define TX_PIN 17   
+#define FRAME_START 0xFF
 
+
+//=====================================
+//CONSTS
+#define RX_COUNT 11
+#define TX_COUNT 53
 
 
 //=====================================
