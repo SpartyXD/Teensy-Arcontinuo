@@ -7,7 +7,6 @@
 #include "utils.h"
 #include "gyro.h"
 #include "logo.h"
-vvvvvvv
 #include "dataHandler.h"
 #include "settings.h"
 
