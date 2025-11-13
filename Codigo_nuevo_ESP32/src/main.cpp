@@ -27,24 +27,31 @@
 #include <Wire.h>
 #include <EEPROM.h>
 
-
 // --- LIBRERÍAS PERSONALIZADAS ---
+#include <settings.h>
+#include <midi.h>
+#include <data.h>
+#include <main_a.h>
+#include <main_b.h>
+
 #include "utils.h"
 #include "gyro.h"
 #include "stub.h"
 #include "midiHandler.h"
+#include "settings.h"
+#include <pitchHandler.h>
 #include "logo.h"
 #include "dataHandler.h"
-#include "settings.h"
 #include "buttons.h"
-#include "pitchHandler.h"
+
+
 
 // =================================================================
 // 1. DEFINICIÓN DE TAREAS Y COLA (RTOS)
 
 // Cores
-#define DATA_CORE 1 // Núcleo para sensores (Core 1)
 #define MIDI_CORE 0 // Núcleo para USB y MIDI (Core 0)
+#define DATA_CORE 1 // Núcleo para sensores (Core 1)
 
 // Estructura de recepción blobs (es una abstracción)
 struct SensorData {
@@ -129,10 +136,10 @@ void setup() {
 
   // USB MIDI init
   TinyUSBDevice.setManufacturerDescriptor("PIO");
-  TinyUSBDevice.setProductDescriptor("EspUSB");
+  TinyUSBDevice.setProductDescriptor("Arcontinuo");
   MidiUsb.begin(MIDI_CHANNEL_OMNI);
   MidiUsb.setHandleControlChange(receiveControlChange);
-  Serial.println("Midi USB setup done");
+  Serial.println("Midi USB listo para usarse!");
 
   // 1. Inicializar componentes básicos
   // Inicializar EEPROM (¡OBLIGATORIO EN ESP32!)
@@ -175,104 +182,28 @@ void setup() {
   // FreeRTOS Tasks
   Serial.println("Lanzando tareas RTOS...");
 
-// Tarea de Sensores: Core 1 (DATA_CORE), Prioridad 2 (más alta)
+    // Tarea de MIDI: Core 0 (MIDI_CORE), Prioridad 1 (más baja)
+  xTaskCreatePinnedToCore(
+      core_A_main,       // Función de la tarea
+      "Core_A_main",     // Nombre (para debug)
+      1024 * 4,       // Tamaño del stack (4KB)
+      NULL,           // Parámetros de la tarea
+      1,              // Prioridad
+      NULL,           // Handle de la tarea
+      MIDI_CORE);     // Núcleo donde se ejecuta
+
+  // Tarea de Sensores: Core 1 (DATA_CORE), Prioridad 2 (más alta)
     xTaskCreatePinnedToCore(
-        sensorTask,     // Función de la tarea
-        "SensorTask",   // Nombre (para debug)
+        core_B_main,     // Función de la tarea
+        "Core_B_main",   // Nombre (para debug)
         1024 * 4,       // Tamaño del stack (4KB)
         NULL,           // Parámetros de la tarea
         2,              // Prioridad
         NULL,           // Handle de la tarea
         DATA_CORE);     // Núcleo donde se ejecuta
 
-    // Tarea de MIDI: Core 0 (MIDI_CORE), Prioridad 1 (más baja)
-    xTaskCreatePinnedToCore(
-        midiTask,       // Función de la tarea
-        "MidiTask",     // Nombre (para debug)
-        1024 * 4,       // Tamaño del stack (4KB)
-        NULL,           // Parámetros de la tarea
-        1,              // Prioridad
-        NULL,           // Handle de la tarea
-        MIDI_CORE);     // Núcleo donde se ejecuta
 
   utils.disp("Fin del setup. RTOS tomando el control.");
-}
-
-// =================================================================
-// 5. TAREA DEL CORE 1: LECTURA DE SENSORES
-
-void sensorTask(void *parameter) {
-  Serial.println("Task de Sensores iniciada en Core 1.");
-  SensorData dataToSend;
-
-  // Bucle infinito de la tarea
-  for (;;) {
-    // --- 1. LEER Y FILTRAR DATOS ---
-    // (Aquí va todo el código de tu antigua ESP32)
-    
-    // Leer Giroscopio (usando el objeto gyro)
-    //gyro.update(); // Actualiza los valores internos del giroscopio
-    //dataToSend.acelerometro_x = gyro.getAcelX(); // (asumiendo estas funciones)
-    //dataToSend.giroscopo_z = gyro.getGyroZ();
-    
-    // Leer Malla Capacitiva (tus "blobs")
-    // (Aquí iría tu lógica de filtrado de la malla)
-    dataToSend.blob_count = 1;
-    dataToSend.blob1_x = 0.5; // (valor de ejemplo)
-    dataToSend.blob1_pressure = 0.8; // (valor de ejemplo)
-    // ... etc ...
-
-    // --- 2. ENVIAR DATOS A LA COLA ---
-    // Envía la estructura completa al Core 0.
-    // No espera si la cola está llena (timeout 0)
-    xQueueSend(sensorDataQueue, &dataToSend, (TickType_t)0);
-    
-    // Espera 10ms (100Hz) antes de la próxima lectura.
-    // Ajusta esto a tu necesidad de "sample rate".
-    vTaskDelay(pdMS_TO_TICKS(10)); 
-  }
-}
-
-// =================================================================
-// 6. TAREA DEL CORE 0: LÓGICA MIDI Y PC
-
-void midiTask(void *parameter) {
-  Serial.println("Task de MIDI iniciada en Core 0.");
-  SensorData receivedData;
-
-  // Bucle infinito de la tarea
-  for (;;) {
-    
-    // --- 1. REVISAR SI LLEGÓ MIDI DESDE EL PC ---
-    // ¡OBLIGATORIO! Esto revisa el USB y dispara los
-    // callbacks (receiveControlChange, receiveSysEx)
-    MidiUsb.read();
-
-    // --- 2. REVISAR SI LLEGARON DATOS DE SENSORES ---
-    // Revisa la cola. Si hay datos nuevos del Core 1, procésalos.
-    // Espera 0 ticks (no bloquea), solo revisa si hay algo.
-    if (xQueueReceive(sensorDataQueue, &receivedData, (TickType_t)0) == pdPASS) {
-      
-      // ¡Llegaron datos! Pásalos a los handlers
-      // (Esta es la lógica de tu antigua Teensy)
-      
-      // El dataHandler podría tomar los blobs y pasarlos al pitchHandler
-      //dataHandler.processSensorData(receivedData); 
-      
-      // El midiHandler toma los datos y los convierte/envía por USB
-      //midiHandler.sendMidiFromSensorData(receivedData);
-
-      // (Las funciones de arriba son ejemplos, usa las tuyas)
-    }
-
-    // --- 3. REVISAR OTROS EVENTOS (BOTONES, ETC) ---
-    // (Esta es la lógica que estaba en el loop() de tu Teensy)
-    //buttons.update(); // Revisa si se presionó un botón
-    //pitchHandler.update(); // Actualiza el estado del pitch
-    
-    // Da un respiro de 1ms al scheduler para no saturar el Core 0
-    vTaskDelay(pdMS_TO_TICKS(1)); 
-  }
 }
 
 // =================================================================
@@ -282,13 +213,3 @@ void loop() {
   // Vacío. Todo el trabajo se hace en las Tareas RTOS.
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
-
-
-
-/* void loop() {
-  for (int i = 0; i < 128; i++) {
-    MidiUsb.sendControlChange(0, i, 1);
-    delay(100);
-  }
-}
- */
