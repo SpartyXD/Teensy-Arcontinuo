@@ -14,7 +14,7 @@
 //---------------------------------------------
 // Interfaces USB (CDC + MIDI)
 Adafruit_USBD_CDC SerialUSB;
-Adafruit_USBD_MIDI usb_midi;
+extern Adafruit_USBD_MIDI usb_midi; // se crea en el main.cpp
 
 //---------------------------------------------
 //Function declarations

@@ -7,7 +7,8 @@
 #include <MPU6050_tockn.h>
 
 #include "utils.h"
-
+#include "stub.h"
+#include "dataHandler.h"
 
 
 class Settings; // Declaración anticipada
@@ -23,6 +24,8 @@ class Gyro : Utils {
         static const byte FILTER_ORDER = 30;
         float filterX[FILTER_ORDER] = {0};
         float filterY[FILTER_ORDER] = {0};
+
+        Gyro();
 
         void begin();
         void setSettings(Settings* s);

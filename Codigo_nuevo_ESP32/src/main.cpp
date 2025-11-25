@@ -29,7 +29,7 @@
 
 // --- LIBRERÍAS PERSONALIZADAS ---
 #include <settings.h>
-#include <midi.h>
+#include <midi_aux.h>
 #include <data.h>
 #include <main_a.h>
 #include <main_b.h>
@@ -39,10 +39,10 @@
 #include "stub.h"
 #include "midiHandler.h"
 #include "settings.h"
-#include <pitchHandler.h>
+#include "pitchHandler.h"
 #include "logo.h"
 #include "dataHandler.h"
-#include "buttons.h"
+//#include "buttons.h"
 
 
 
@@ -83,7 +83,7 @@ void midiTask(void *parameter);
 // Objetos principales
 Settings settings;
 Logo logo;
-Buttons buttons;
+//Buttons buttons;
 MidiHandler midiHandler;
 PitchHandler pitchHandler;
 DataHandler dataHandler;
@@ -152,13 +152,13 @@ void setup() {
   settings.begin();
   Serial.println("Settings y EEPROM listos");
   
-  buttons.begin();
+  //buttons.begin();
   pitchHandler.begin();
   gyro.begin();
 
 // 3. Conectar dependencias entre componentes
-  buttons.setSettings(&settings);
-  buttons.setPitchHandler(&pitchHandler);
+  //buttons.setSettings(&settings);
+  //buttons.setPitchHandler(&pitchHandler);
   dataHandler.setSettings(&settings);
   dataHandler.setPitchHandler(&pitchHandler);
   gyro.setSettings(&settings);
