@@ -27,6 +27,11 @@
 #include <Wire.h>
 #include <EEPROM.h>
 
+// -- Header Comun ---
+// Esto si o si debe ir antes que las librerías personalizadas
+#include "common.h"
+
+
 // --- LIBRERÍAS PERSONALIZADAS ---
 #include <settings.h>
 #include <midi_aux.h>
@@ -45,7 +50,6 @@
 //#include "buttons.h"
 
 
-
 // =================================================================
 // 1. DEFINICIÓN DE TAREAS Y COLA (RTOS)
 
@@ -53,29 +57,10 @@
 #define MIDI_CORE 0 // Núcleo para USB y MIDI (Core 0)
 #define DATA_CORE 1 // Núcleo para sensores (Core 1)
 
-// Estructura de recepción blobs (es una abstracción)
-struct SensorData {
-  float acelerometro_x;
-  float giroscopo_z;
-  int sensor_distancia;
-  
-  // --- Datos de la Malla Capacitiva (Blobs) ---
-  // (Esto es un ejemplo, ajústalo a tus necesidades)
-  int   blob_count;
-  float blob1_x;
-  float blob1_y;
-  float blob1_pressure;
-  float blob1_velocity_x;
-  // ... (blob2, blob3, etc.)
-};
 
 // Handle de la cola (Queue) de RTOS
 QueueHandle_t sensorDataQueue;
 
-
-// Prototipos de las tareas
-void sensorTask(void *parameter);
-void midiTask(void *parameter);
 
 // =================================================================
 // 2. OBJETOS GLOBALES E INSTANCIAS MIDI
@@ -213,3 +198,5 @@ void loop() {
   // Vacío. Todo el trabajo se hace en las Tareas RTOS.
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
+
+
